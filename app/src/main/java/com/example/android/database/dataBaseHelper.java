@@ -10,6 +10,9 @@ import android.support.annotation.Nullable;
 public class dataBaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "contact.db";
     private static final String TABLE_NAME = "contact";
+    public static final String COL_2 = "NAME";
+    public static final String COL_3 = "MOBILE";
+    public static final String COL_4 = "EMAIL";
 
 
     public dataBaseHelper(@Nullable Context context) {
@@ -19,7 +22,7 @@ public class dataBaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE_NAME + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,NAME TEXT,MOBILE INTERGER,EMAIL TEXT)");
+        db.execSQL("CREATE TABLE " + TABLE_NAME + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,NAME TEXT,MOBILE LONG,EMAIL TEXT)");
 
     }
 
@@ -29,15 +32,13 @@ public class dataBaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public boolean insertdata(String name, int Mobile_no, String Email) {
+    public boolean insertdata(String name, Long Mobile_no, String Email) {
         SQLiteDatabase db = this.getWritableDatabase();
-
         ContentValues contentValues = new ContentValues();
-        contentValues.put("NAME", name);
-        contentValues.put("MOBILE", Mobile_no);
-        contentValues.put("EMAIL", Email);
-
-        long result = db.insert(TABLE_NAME, null, contentValues);
+        contentValues.put(COL_2, name);
+        contentValues.put(COL_3, Mobile_no);
+        contentValues.put(COL_4, Email);
+        Long result = db.insert(TABLE_NAME, null, contentValues);
         if (result == -1)
             return false;
         else
@@ -46,14 +47,29 @@ public class dataBaseHelper extends SQLiteOpenHelper {
 
     public Cursor getData(String mobile_number) {
         SQLiteDatabase db = this.getWritableDatabase();
-        String query = "SELECT * FROM " + TABLE_NAME +" WHERE MOBILE ='" + mobile_number + "'";
+        String query = "SELECT * FROM " + TABLE_NAME +" WHERE "+COL_3+" ='" + mobile_number + "'";
         Cursor cursor = db.rawQuery(query, null);
         return cursor;
     }
     public void getDelete(String mobile_number){
         SQLiteDatabase db = this.getWritableDatabase();
        db.delete(TABLE_NAME,"MOBILE = '"+mobile_number+"'",null);
+       db.close();
 
+    }
+    public void update(String number,String name,String Email){
+        SQLiteDatabase db=this.getWritableDatabase();
+        ContentValues contentValues=new ContentValues();
+        contentValues.put("NAME",name);
+        contentValues.put("EMAIL",Email);
+
+        db.update(TABLE_NAME,contentValues,"MOBILE = '"+number+"'",null);
+        db.close();
+    }
+    public Cursor getAllData() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor res = db.rawQuery("select * from "+TABLE_NAME,null);
+        return res;
     }
 
 }
